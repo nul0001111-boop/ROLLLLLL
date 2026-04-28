@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>롤토체스 주말 캠프 신청</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f4f0; color: #1a1a18; min-height: 100vh; }
+  .page { max-width: 600px; margin: 0 auto; padding: 1.5rem 1rem 4rem; }
+
+  .hero { text-align: center; padding: 2.5rem 1rem 2rem; }
+  .hero-badge { display: inline-block; background: #EEEDFE; color: #3C3489; font-size: 12px; padding: 4px 14px; border-radius: 20px; margin-bottom: 12px; }
+  .hero h1 { font-size: 26px; font-weight: 600; margin-bottom: 6px; }
+  .hero p { color: #666; font-size: 15px; }
+
+  .tab-row { display: flex; gap: 6px; margin-bottom: 1rem; }
+  .tab { flex: 1; padding: 9px; border-radius: 10px; border: 1px solid #ddd; background: white; font-size: 13px; font-weight: 500; cursor: pointer; color: #888; transition: all 0.15s; }
+  .tab.active { background: #534AB7; color: white; border-color: #534AB7; }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  .section { background: white; border: 1px solid #e8e6e0; border-radius: 14px; padding: 1.25rem; margin-bottom: 1rem; }
+  .section-title { font-size: 11px; font-weight: 600; color: #999; margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.07em; }
+
+  .form-grid { display: grid; gap: 14px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field label { font-size: 13px; color: #666; }
+  input, select, textarea {
+    font-family: inherit; font-size: 14px; width: 100%; padding: 9px 12px;
+    border: 1px solid #ddd; border-radius: 8px; background: white; color: #1a1a18; outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  input:focus, select:focus, textarea:focus { border-color: #7F77DD; box-shadow: 0 0 0 3px rgba(127,119,221,0.12); }
+  textarea { resize: vertical; min-height: 72px; }
+
+  .date-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .date-item { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; cursor: pointer; padding: 14px 8px; border: 1px solid #e0ddd8; border-radius: 10px; transition: all 0.15s; text-align: center; background: white; }
+  .date-item:hover { background: #f5f4f0; }
+  .date-item.selected { border-color: #7F77DD; background: #EEEDFE; }
+  .date-item .dow { font-size: 11px; color: #999; }
+  .date-item.selected .dow { color: #534AB7; }
+  .date-item .day { font-size: 22px; font-weight: 600; color: #1a1a18; line-height: 1.2; }
+  .date-item.selected .day { color: #3C3489; }
+  .date-item .month { font-size: 11px; color: #aaa; }
+  .date-item.selected .month { color: #7F77DD; }
+  .date-item .dot { width: 6px; height: 6px; border-radius: 50%; background: transparent; margin-top: 4px; transition: background 0.15s; }
+  .date-item.selected .dot { background: #7F77DD; }
+
+  .checkbox-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .checkbox-item { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; padding: 9px 12px; border: 1px solid #e0ddd8; border-radius: 8px; transition: all 0.15s; line-height: 1.4; background: white; }
+  .checkbox-item:hover { background: #f5f4f0; }
+  .checkbox-item.selected { border-color: #7F77DD; background: #EEEDFE; color: #3C3489; }
+  .checkbox-icon { width: 16px; height: 16px; border-radius: 4px; border: 1.5px solid #ccc; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: white; transition: all 0.15s; }
+  .checkbox-item.selected .checkbox-icon { background: #7F77DD; border-color: #7F77DD; }
+  .check { display: none; }
+  .checkbox-item.selected .check { display: block; }
+  .deck-sub { font-size: 11px; color: #aaa; display: block; margin-top: 1px; }
+  .checkbox-item.selected .deck-sub { color: #7F77DD; }
+
+  .wish-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .wish-item { display: flex; align-items: flex-start; gap: 8px; cursor: pointer; font-size: 13px; padding: 10px 12px; border: 1px solid #e0ddd8; border-radius: 8px; transition: all 0.15s; line-height: 1.4; background: white; }
+  .wish-item:hover { background: #f5f4f0; }
+  .wish-item.selected { border-color: #1D9E75; background: #E1F5EE; color: #085041; }
+  .wish-icon { width: 16px; height: 16px; border-radius: 4px; border: 1.5px solid #ccc; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; background: white; transition: all 0.15s; }
+  .wish-item.selected .wish-icon { background: #1D9E75; border-color: #1D9E75; }
+  .wish-check { display: none; }
+  .wish-item.selected .wish-check { display: block; }
+  .wish-sub { font-size: 11px; color: #aaa; display: block; margin-top: 1px; }
+  .wish-item.selected .wish-sub { color: #0F6E56; }
+
+  .submit-btn { width: 100%; padding: 13px; font-size: 15px; font-weight: 600; border: none; border-radius: 10px; background: #534AB7; color: white; cursor: pointer; transition: opacity 0.15s, transform 0.1s; }
+  .submit-btn:hover { opacity: 0.9; }
+  .submit-btn:active { transform: scale(0.99); }
+  .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .success-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100; align-items: center; justify-content: center; }
+  .success-overlay.visible { display: flex; }
+  .success-card { background: white; border-radius: 16px; padding: 2rem; max-width: 320px; width: 90%; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.15); }
+  .success-icon { width: 56px; height: 56px; border-radius: 50%; background: #EEEDFE; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; }
+  .success-card h2 { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+  .success-card p { font-size: 14px; color: #666; line-height: 1.6; }
+  .close-btn { margin-top: 20px; padding: 10px 24px; border: 1px solid #ddd; border-radius: 8px; background: white; font-size: 14px; cursor: pointer; font-family: inherit; }
+  .close-btn:hover { background: #f5f4f0; }
+
+  .notice { background: #EEEDFE; border-radius: 10px; padding: 12px 14px; font-size: 13px; color: #3C3489; text-align: center; margin-bottom: 1rem; }
+
+  @media (max-width: 480px) {
+    .form-row { grid-template-columns: 1fr; }
+    .checkbox-grid { grid-template-columns: 1fr; }
+    .wish-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="hero">
+    <div class="hero-badge">TFT SET 17 · 우주의 신들</div>
+    <h1>롤토체스 주말 캠프</h1>
+    <p>하루종일 롤체만 하는 최강 캠프</p>
+  </div>
+
+  <div class="notice">신청 내용은 주최자에게 실시간으로 전달돼요!</div>
+
+  <div class="section">
+    <div class="section-title">참가 신청</div>
+    <div class="form-grid">
+      <div class="form-row">
+        <div class="field">
+          <label>이름 / 닉네임</label>
+          <input type="text" id="name" placeholder="소환사명" />
+        </div>
+        <div class="field">
+          <label>티어</label>
+          <select id="tier">
+            <option value="">선택</option>
+            <option>아이언</option><option>브론즈</option><option>실버</option>
+            <option>골드</option><option>플레티넘</option><option>에메랄드</option>
+            <option>다이아</option><option>마스터+</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>참가 가능한 날짜 (복수 선택 가능)</label>
+        <div class="date-grid">
+          <div class="date-item" onclick="toggleDate(this, 0)">
+            <div class="dow">금요일</div><div class="day">5/1</div>
+            <div class="month">2026년 5월</div><div class="dot"></div>
+          </div>
+          <div class="date-item" onclick="toggleDate(this, 1)">
+            <div class="dow">토요일</div><div class="day">5/2</div>
+            <div class="month">2026년 5월</div><div class="dot"></div>
+          </div>
+          <div class="date-item" onclick="toggleDate(this, 2)">
+            <div class="dow">일요일</div><div class="day">5/3</div>
+            <div class="month">2026년 5월</div><div class="dot"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>선호 덱 스타일 (세트 17 메타)</label>
+        <div class="checkbox-grid" id="deck-grid">
+          <div class="checkbox-item" onclick="toggleCheck(this)">
+            <div class="checkbox-icon"><svg class="check" width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-5" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+            <div><span>불한당 카이사</span><span class="deck-sub">3코 리롤 · 불한당</span></div>
+          </div>
+          <div class="checkbox-item" onclick="toggleCheck(this)">
+            <div class="checkbox-icon"><svg class="check" width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-5" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+            <div><span>고밸류 벡스</span><span class="deck-sub">패스트9 · 5코 밸류</span></div>
+          </div>
+          <div class="checkbox-item" onclick="toggleCheck(this)">
+            <div class="checkbox-icon"><svg class="check" width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-5" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+            <div><span>6메카</span><span class="deck-sub">거대메크로봇 · AS</span></div>
+          </div>
+          <div class="checkbox-item" onclick="toggleCheck(this)">
+            <div class="checkbox-icon"><svg class="check" width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-5" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+            <div><span>동물특공대 오로라</span><span class="deck-sub">3코 리롤 · 도박 시너지</span></div>
+          </div>
+          <div class="checkbox-item" onclick="toggleCheck(this)">
+            <div class="checkbox-icon"><svg class="check" width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-5" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+            <div><span>전도자 미포</span><span class="deck-sub">3코 리롤 · 기동총격</span></div>
+          </div>
+          <div class="checkbox-item" onclick="toggleCheck(this)">
+            <div class="checkbox-icon"><svg class="check" width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-5" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+            <div><span>N.O.V.A 덱</span><span class="deck-sub">타격기 · 상징 활용</span></div>
+          </div>
+          <div class="checkbox-item" onclick="toggleCheck(this)">
+            <div class="checkbox-icon"><svg class="check" width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-5" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+            <div><span>시간균열자 빌드업</span><span class="deck-sub">초반 스노우볼 운영</span></div>
+          </div>
+          <div class="checkbox-item" onclick="toggleCheck(this)">
+            <div class="checkbox-icon"><svg class="check" width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-5" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+            <div><span>빈집 / 유연 운영</span><span class="deck-sub">상황 맞춰서 그때그때</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>주최자에게 바라는 것 (복수 선택 가능)</label>
+        <div class="wish-grid" id="wish-grid">
+          <div class="wish-item" onclick="toggleWish(this)">
+            <div class="wish-icon"><svg class="wish-check" width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-5" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+            <div><span>간식 준비</span><span class="wish-sub">과자 / 음료 좀요</span></div>
+          </div>
+          <div class="wish-item" onclick="toggleWish(this)">
+            <div class="wish-icon"><svg class="wish-check" width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-5" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+            <div><span>식사 해결</span><span class="wish-sub">밥은 같이 먹고 싶어요</span></div>
+          </div>
+          <div class="wish-item" onclick="toggleWish(this)">
+            <div class="wish-icon"><svg class="wish-check" width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-5" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+            <div><span>일정 공지 카톡</span><span class="wish-sub">날짜 확정되면 알려줘요</span></div>
+          </div>
+          <div class="wish-item" onclick="toggleWish(this)">
+            <div class="wish-icon"><svg class="wish-check" width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-5" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+            <div><span>내기 / 벌칙 준비</span><span class="wish-sub">꼴찌는 뭔가 있어야죠</span></div>
+          </div>
+          <div class="wish-item" onclick="toggleWish(this)">
+            <div class="wish-icon"><svg class="wish-check" width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-5" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+            <div><span>딱히 없어요</span><span class="wish-sub">그냥 같이 하면 돼요</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>한마디 (선택)</label>
+        <textarea id="comment" placeholder="각오 한마디, 주의사항 등..."></textarea>
+      </div>
+      <button class="submit-btn" id="submit-btn" onclick="submitForm()">신청 완료</button>
+    </div>
+  </div>
+</div>
+
+<!-- 완료 팝업 -->
+<div class="success-overlay" id="success-overlay">
+  <div class="success-card">
+    <div class="success-icon">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <circle cx="14" cy="14" r="13" stroke="#534AB7" stroke-width="1.5"/>
+        <path d="M8 14l4 4 8-8" stroke="#534AB7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <h2>신청 완료!</h2>
+    <p id="success-msg">신청이 완료됐어요. 주말에 신나게 롤체 합시다!</p>
+    <button class="close-btn" onclick="closeSuccess()">확인</button>
+  </div>
+</div>
+
+<script>
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbykthbtIyCoKIfCykvViUO5okND9Jzxt-vkCdvtA_or78dkFwq82fPYqhRSahTNKeXc/exec';
+const DATE_LABELS = ['5/1 (금)', '5/2 (토)', '5/3 (일)'];
+let selectedDates = [];
+
+function toggleDate(el, idx) {
+  el.classList.toggle('selected');
+  if (el.classList.contains('selected')) {
+    if (!selectedDates.includes(idx)) selectedDates.push(idx);
+  } else {
+    selectedDates = selectedDates.filter(d => d !== idx);
+  }
+}
+function toggleCheck(el) { el.classList.toggle('selected'); }
+function toggleWish(el) { el.classList.toggle('selected'); }
+
+async function submitForm() {
+  const name = document.getElementById('name').value.trim();
+  const tier = document.getElementById('tier').value;
+  if (!name) { alert('닉네임을 입력해주세요'); return; }
+  if (!tier) { alert('티어를 선택해주세요'); return; }
+  if (selectedDates.length === 0) { alert('참가 가능한 날짜를 하나 이상 선택해주세요'); return; }
+
+  const decks = [...document.querySelectorAll('#deck-grid .checkbox-item.selected')].map(el => el.querySelector('span').textContent.trim()).join(', ');
+  const wishes = [...document.querySelectorAll('#wish-grid .wish-item.selected')].map(el => el.querySelector('span').textContent.trim()).join(', ');
+  const dates = [...selectedDates].sort().map(d => DATE_LABELS[d]).join(', ');
+  const comment = document.getElementById('comment').value.trim();
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = '전송 중...';
+
+  try {
+    await fetch(SHEET_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, tier, dates, decks, wishes, comment })
+    });
+
+    // 폼 초기화
+    document.getElementById('name').value = '';
+    document.getElementById('tier').value = '';
+    document.getElementById('comment').value = '';
+    document.querySelectorAll('#deck-grid .checkbox-item').forEach(el => el.classList.remove('selected'));
+    document.querySelectorAll('#wish-grid .wish-item').forEach(el => el.classList.remove('selected'));
+    document.querySelectorAll('.date-item').forEach(el => el.classList.remove('selected'));
+    selectedDates = [];
+
+    document.getElementById('success-msg').textContent = `${name}님 신청 완료! 구글 시트에 저장됐어요 🎉`;
+    document.getElementById('success-overlay').classList.add('visible');
+  } catch (e) {
+    alert('전송 중 오류가 났어요. 다시 시도해주세요.');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '신청 완료';
+  }
+}
+
+function closeSuccess() { document.getElementById('success-overlay').classList.remove('visible'); }
+</script>
+</body>
+</html>
